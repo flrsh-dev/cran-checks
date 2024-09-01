@@ -33,6 +33,6 @@ pkg_check_status <- lapply(splits, jsonify::to_json)
 
 # write the results to json
 for (pkg in names(pkg_check_status)) {
-  fp <- file.path("api", "checks", paste0(pkg, ".json"))
+  fp <- file.path("docs", paste0(pkg, ".json"))
   writeLines(pkg_check_status[[pkg]], fp)
 }
