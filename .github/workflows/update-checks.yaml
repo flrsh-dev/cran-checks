@@ -8,7 +8,7 @@ on:
       - main
     paths-ignore:
       - '**/*'
-    # Only run when the commit message contains '[update]'
+    # Only run when the commit message contains '[update]' 
     types: [committed]
 
 jobs:
