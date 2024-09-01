@@ -1,5 +1,6 @@
 check_url <- "https://cran.r-project.org/web/checks/check_summary_by_package.html"
 
+
 check_results <- rvest::read_html(check_url) |>
   rvest::html_node("table") |>
   rvest::html_table()
@@ -13,6 +14,7 @@ check_names <- c("r-develLinuxx86_64(Debian Clang)", "r-develLinuxx86_64(Debian 
 flavor_lu <- setNames(flavor_names, check_names)
 
 # tidy up the results
+cli::cli_alert_info("Tidying results")
 check_long <- check_results |>
   tidyr::pivot_longer(
     cols = -c("Package", "Version", "Priority", "Maintainer"),
@@ -29,10 +31,12 @@ check_long <- check_results |>
 splits <- split(check_long, check_long$package)
 
 # convert each row to json
+cli::cli_inform("Converting checks to json")
 pkg_check_status <- lapply(splits, jsonify::to_json)
 
 # write the results to json
 for (pkg in names(pkg_check_status)) {
   fp <- file.path("docs", paste0(pkg, ".json"))
+  cli::cli_inform(c("*" = "writing {.file {fp}}"))
   writeLines(pkg_check_status[[pkg]], fp)
 }
