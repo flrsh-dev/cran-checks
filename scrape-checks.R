@@ -32,7 +32,11 @@ splits <- split(check_long, check_long$package)
 
 # convert each row to json
 cli::cli_inform("Converting checks to json")
-pkg_check_status <- lapply(splits, jsonify::to_json)
+
+pkg_check_status <- lapply(
+  splits,
+  \(.x) jsonify::to_json(unclass(.x), unbox = TRUE)
+)
 
 # write the results to json
 for (pkg in names(pkg_check_status)) {
