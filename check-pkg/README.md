@@ -26,10 +26,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Run CRAN Checks for spdep
-        uses: flrsh-dev/cran-checks/check-pkg
+      - name: Get CRAN checks
+        uses: flrsh-dev/cran-checks/check-pkg@v0.1.0
         with:
-          pkg: spdep
+          pkg: b64
 ```
 
 ## License
