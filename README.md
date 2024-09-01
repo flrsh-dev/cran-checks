@@ -12,7 +12,8 @@ Create a new GitHub Action with
 
 ```r
 usethis::use_github_action(
-  url = "https://github.com/flrsh-dev/cran-checks/blob/main/check-pkg/cran-checks.yaml"
+  url = "https://github.com/flrsh-dev/cran-checks/blob/main/check-pkg/cran-checks.yaml",
+  open = TRUE
 )
 ```
 
