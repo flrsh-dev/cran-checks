@@ -6,9 +6,24 @@ This repository contains a GitHub Action that can be used to get daily updates o
 
 ## Usage
 
-Create a file `.github/workflows/cran-checks.yaml`.
 
-Paste the below in the file. Be sure to change the **`pkg`**  input to the name of your package.
+### Using {usethis}
+Create a new GitHub Action with 
+
+```r
+usethis::use_github_action(
+  url = "https://github.com/flrsh-dev/cran-checks/blob/main/check-pkg/cran-checks.yaml"
+)
+```
+
+Be sure to change the **`pkg`**  input to the name of your package.
+
+
+### Manually
+
+Or, create the file manually. Create a file `.github/workflows/cran-checks.yaml`.
+
+Paste the below in the file. 
 
 ```yaml
 name: Check CRAN status
@@ -28,7 +43,7 @@ jobs:
       - name: Get CRAN checks
         uses: flrsh-dev/cran-checks/check-pkg@main
         with:
-          pkg: b64
+          pkg: YOUR-PKG-NAME
 ```
 
 
