@@ -6,11 +6,7 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - '**/*'
-    # Only run when the commit message contains '[update]' 
-    types: [committed]
-
+  
 jobs:
   cran_checks:
     if: "contains(github.event.head_commit.message, '[update]') || github.event_name == 'schedule'"
