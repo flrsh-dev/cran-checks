@@ -15,6 +15,8 @@ flavor_lu <- setNames(flavor_names, check_names)
 
 # tidy up the results
 cli::cli_alert_info("Tidying results")
+
+
 check_long <- check_results |>
   tidyr::pivot_longer(
     cols = -c("Package", "Version", "Priority", "Maintainer"),
