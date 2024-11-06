@@ -26,32 +26,40 @@ runs:
     - name: Check CRAN checks
       id: cran-check-status
       run: |
-        pkg <- "${{ inputs.pkg }}"
-        fp <- paste0("https://flrsh-dev.github.io/cran-checks/", pkg, ".json")
-
-        json <- tryCatch(readLines(fp),
-          warning = function(e) {
-            stop("Package ", pkg, " not found in CRAN checks", call. = FALSE)
-          }
-        )
-
-        res <- yyjsonr::read_json_str(json)
+        pkgs <- unlist(strsplit("${{ inputs.pkg }}", "\\s+"))
+        pkgs <- pkgs[pkgs != ""]
         
-        if (any("ERROR" %in% res$results[[1]]$check_status)) {
-          stop(
-            "Errors found in CRAN checks",
-            "\n",
-            "Review logs at ", 
-            "https://cran.r-project.org/web/checks/check_results_", pkg, ".html"
+        pkg_errs <- character(0)
+        pkg_warn <- character(0)
+        for(pkg in pkgs) {
+          fp <- paste0("https://flrsh-dev.github.io/cran-checks/", pkg, ".json")
+        
+          json <- tryCatch(readLines(fp),
+                           warning = function(e) {
+                             stop("Package ", pkg, " not found in CRAN checks", call. = FALSE)
+                           }
           )
-        } else if (any("WARN" %in% res$results[[1]]$check_status)) {
-          stop(
-            "Warnings found in CRAN checks",
-            "\n",
-            "Review logs at ", 
-            "https://cran.r-project.org/web/checks/check_results_", pkg, ".html"
-          )
+        
+          res <- yyjsonr::read_json_str(json)
+        
+          if (any("ERROR" %in% res$results[[1]]$check_status)) {
+            pkg_errs <- c(pkg_errs, pkg)
+          } else if (any("WARN" %in% res$results[[1]]$check_status)) {
+            pkg_warn <- c(pkg_warn, pkg)
+          }
         }
         
-        message("\u2713 `", pkg, "` has no warnings or errors")
+        msg <- ""
+        if(length(pkg_errs) > 0) {
+          msg <- paste0("Errors found in CRAN checks for ", paste0("{", pkg_errs, "}", collapse = ", "), ". ")
+        }
+        if(length(pkg_warn) > 0) {
+          msg <- paste0(msg, "Warnings found in CRAN checks for ", paste0("{", pkg_warn, "}", collapse = ", "), ".")
+        }
+        if(nchar(msg) > 0) {
+          msg <- paste0(msg, "\n\nReview logs at:\n", paste0("  https://cran.r-project.org/web/checks/check_results_", c(pkg_errs, pkg_warn), ".html", collapse = "\n"))
+          stop(msg)
+        }
+        
+        message("\u2713 No warnings or errors for ", paste0("{", pkgs, "}", collapse = ", "), ".")
       shell: Rscript {0}
