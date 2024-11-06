@@ -29,6 +29,7 @@ runs:
         pkgs <- unlist(strsplit("${{ inputs.pkg }}", "\\s+"))
         pkgs <- pkgs[pkgs != ""]
         
+        pkg_miss <- character(0)
         pkg_errs <- character(0)
         pkg_warn <- character(0)
         for(pkg in pkgs) {
@@ -36,9 +37,13 @@ runs:
         
           json <- tryCatch(readLines(fp),
                            warning = function(e) {
-                             stop("Package ", pkg, " not found in CRAN checks", call. = FALSE)
+                             return(NULL)
                            }
           )
+          if(is.null(json)) {
+            pkg_miss <- c(pkg_miss, pkg)
+            next
+          }
         
           res <- yyjsonr::read_json_str(json)
         
@@ -50,8 +55,11 @@ runs:
         }
         
         msg <- ""
+        if(length(pkg_miss) > 0) {
+          msg <- paste0("Cannot find ", paste0("{", pkg_miss, "}", collapse = ", "), " on CRAN. ")
+        }
         if(length(pkg_errs) > 0) {
-          msg <- paste0("Errors found in CRAN checks for ", paste0("{", pkg_errs, "}", collapse = ", "), ". ")
+          msg <- paste0(msg, "Errors found in CRAN checks for ", paste0("{", pkg_errs, "}", collapse = ", "), ". ")
         }
         if(length(pkg_warn) > 0) {
           msg <- paste0(msg, "Warnings found in CRAN checks for ", paste0("{", pkg_warn, "}", collapse = ", "), ".")
